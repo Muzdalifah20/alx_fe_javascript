@@ -273,7 +273,7 @@ async function syncQuotes() {
   
   saveQuotes();
   populateCategories();
-  showStatus('Quotes synced successfully!');
+  showStatus('Quotes synced with server!');
 }
 
 
