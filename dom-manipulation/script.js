@@ -229,6 +229,30 @@ document.getElementById('syncBtn').addEventListener('click', fetchQuotesFromServ
 // Initialize sync
 startAutoSync();
 
+ 
+async function sendQuotesToServer() {
+  try {
+    const response = await fetch('https://jsonplaceholder.typicode.com/posts', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        title: quotes[0]?.text || 'New quote',
+        body: 'Sent from local app',
+        userId: 1
+      })
+    });
+    
+    if (response.ok) {
+      console.log('Quote sent to server successfully');
+    }
+  } catch (error) {
+    console.error('Send failed:', error);
+  }
+}
+
+
 
   // initialize categories and first view
   populateCategories();
