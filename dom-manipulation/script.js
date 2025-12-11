@@ -9,7 +9,7 @@ window.addEventListener('DOMContentLoaded', () => {
   ];
 
   // 1) Show random quote
-  function randomQuote() {
+  function showRandomQuote() {
     const randomIndex = Math.floor(Math.random() * quotes.length);
     const randomQuote = quotes[randomIndex];
     console.log(`"${randomQuote.text}" - ${randomQuote.category}`);
@@ -20,7 +20,7 @@ window.addEventListener('DOMContentLoaded', () => {
   const quoteDisplay = document.getElementById('quoteDisplay');
 
   newQuoteBtn.addEventListener('click', () => {
-    const randomQuoteObj = randomQuote();
+    const randomQuoteObj = showRandomQuote();
     quoteDisplay.innerHTML = `
       <h2>${randomQuoteObj.text}</h2>
       <h3>${randomQuoteObj.category}</h3>
