@@ -194,7 +194,7 @@ async function fetchServerQuotes() {
   }
 }
 
-async function syncWithServer() {
+async function fetchQuotesFromServer() {
   showStatus('Syncing...');
   
   const serverQuotes = await fetchServerQuotes();
@@ -220,11 +220,11 @@ async function syncWithServer() {
 
 // Auto-sync every 30 seconds
 function startAutoSync() {
-  syncInterval = setInterval(syncWithServer, 30000);
+  syncInterval = setInterval(fetchQuotesFromServer, 30000);
 }
 
 // Manual sync button
-document.getElementById('syncBtn').addEventListener('click', syncWithServer);
+document.getElementById('syncBtn').addEventListener('click', fetchQuotesFromServer);
 
 // Initialize sync
 startAutoSync();
