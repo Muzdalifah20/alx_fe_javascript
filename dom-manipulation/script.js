@@ -15,6 +15,16 @@ window.addEventListener('DOMContentLoaded', () => {
     sessionStorage.setItem('lastQuote', JSON.stringify(quotes[quotes.length-1])); // Session storage
   }
 
+  function createAddQuoteForm(){
+     const formContainer = document.createElement('div');
+    formContainer.innerHTML = `
+      <input id="newQuoteText" type="text" placeholder="Enter a new quote" />
+      <input id="newQuoteCategory" type="text" placeholder="Enter quote category" />
+      <button type="button" onclick="addQuote()">Add Quote</button>
+    `;
+    return formContainer;
+  }
+
   function showRandomQuote() {
     const randomIndex = Math.floor(Math.random() * quotes.length);
     const randomQuote = quotes[randomIndex];
