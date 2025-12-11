@@ -1,6 +1,8 @@
 window.addEventListener('DOMContentLoaded', () => {
 
-  const quotes = [
+  // Load from localStorage on init (MISSING)
+  const savedQuotes = localStorage.getItem('quotes');
+  let quotes = savedQuotes ? JSON.parse(savedQuotes) : [
     { id: 1, text: "The only way to do great work is to love what you do.", category: "motivation" },
     { id: 2, text: "Code is like humor. When you have to explain it, it's bad.", category: "programming" },
     { id: 3, text: "Life is what happens when you're busy making other plans.", category: "life" },
@@ -8,7 +10,11 @@ window.addEventListener('DOMContentLoaded', () => {
     { id: 5, text: "Success usually comes to those who are too busy looking for it.", category: "success" }
   ];
 
-  // 1) Show random quote
+  function saveQuotes() {
+    localStorage.setItem('quotes', JSON.stringify(quotes));
+    sessionStorage.setItem('lastQuote', JSON.stringify(quotes[quotes.length-1])); // Session storage
+  }
+
   function showRandomQuote() {
     const randomIndex = Math.floor(Math.random() * quotes.length);
     const randomQuote = quotes[randomIndex];
@@ -27,13 +33,11 @@ window.addEventListener('DOMContentLoaded', () => {
     `;
   });
 
-  // 2) Add quote from form
   function addQuote(event) {
-    
     event.preventDefault();
 
     const textInput = document.getElementById('newQuoteText');
-    const categoryInput = document.getElementById('newQuoteCategory');  
+    const categoryInput = document.getElementById('newQuoteCategory');
 
     const text = textInput.value.trim();
     const category = categoryInput.value.trim() || 'uncategorized';
@@ -49,15 +53,36 @@ window.addEventListener('DOMContentLoaded', () => {
       category: category
     };
 
-    quotes.push(newQuote);
-    console.log('New quote added: ', newQuote);
+    quotes.push(newQuote); // FIXED: push FIRST
+    saveQuotes(); // FIXED: save AFTER push
 
-    // clear inputs
+    console.log('New quote added: ', newQuote);
     textInput.value = "";
     categoryInput.value = "";
   }
 
-  // attach submit handler to the form
   const form = document.getElementById('quoteForm');
   form.addEventListener('submit', addQuote);
+
+  window.exportQuotes = function(){
+    const dataStr = JSON.stringify(quotes, null, 2);
+    const dataBlob = new Blob([dataStr], { type: 'application/json' });
+    const url = URL.createObjectURL(dataBlob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `quotes-${new Date().toISOString().slice(0, 10)}.json`;
+    link.click();
+    URL.revokeObjectURL(url);
+  };
+
+  window.importFromJsonFile = function(event){
+    const fileReader = new FileReader();
+    fileReader.onload = function(e){
+      const importedQuotes = JSON.parse(e.target.result);
+      quotes.push(...importedQuotes);
+      saveQuotes();
+      alert('Quotes imported successfully!');
+    };
+    fileReader.readAsText(event.target.files[0]);
+  };
 });
