@@ -165,6 +165,71 @@ window.addEventListener('DOMContentLoaded', () => {
     fileReader.readAsText(event.target.files[0]);
   };
 
+  // Server sync functions (add before initialization)
+let syncInterval;
+
+function showStatus(message, isError = false) {
+  const status = document.getElementById('status');
+  status.textContent = message;
+  status.style.color = isError ? 'red' : 'green';
+}
+
+async function fetchServerQuotes() {
+  try {
+    // JSONPlaceholder mock API
+    const response = await fetch('https://jsonplaceholder.typicode.com/posts?_limit=5');
+    const serverData = await response.json();
+    
+    // Transform to quote format
+    const serverQuotes = serverData.map(post => ({
+      id: Date.now() + Math.random(),
+      text: post.title,
+      category: 'server'
+    }));
+    
+    return serverQuotes;
+  } catch (error) {
+    console.error('Server fetch failed:', error);
+    return [];
+  }
+}
+
+async function syncWithServer() {
+  showStatus('Syncing...');
+  
+  const serverQuotes = await fetchServerQuotes();
+  const localIds = quotes.map(q => q.id);
+  
+  // Server takes precedence - add new server quotes
+  serverQuotes.forEach(serverQuote => {
+    if (!localIds.includes(serverQuote.id)) {
+      quotes.unshift(serverQuote); // Add to beginning
+    }
+  });
+  
+  saveQuotes();
+  populateCategories();
+  showStatus(`Synced ${serverQuotes.length} server quotes!`);
+  
+  // Show first server quote
+  const serverQuote = quotes.find(q => q.category === 'server');
+  if (serverQuote) {
+    quoteDisplay.innerHTML = `<h2>${serverQuote.text}</h2><h3>${serverQuote.category}</h3>`;
+  }
+}
+
+// Auto-sync every 30 seconds
+function startAutoSync() {
+  syncInterval = setInterval(syncWithServer, 30000);
+}
+
+// Manual sync button
+document.getElementById('syncBtn').addEventListener('click', syncWithServer);
+
+// Initialize sync
+startAutoSync();
+
+
   // initialize categories and first view
   populateCategories();
   filterQuotes();
