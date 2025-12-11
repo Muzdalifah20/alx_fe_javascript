@@ -224,7 +224,8 @@ function startAutoSync() {
 }
 
 // Manual sync button
-document.getElementById('syncBtn').addEventListener('click', fetchQuotesFromServer);
+document.getElementById('syncBtn').addEventListener('click', syncQuotes);
+
 
 // Initialize sync
 startAutoSync();
@@ -252,6 +253,28 @@ async function sendQuotesToServer() {
   }
 }
 
+ 
+async function syncQuotes() {
+  showStatus('Syncing with server...');
+  
+  // Fetch from server
+  const serverQuotes = await fetchQuotesFromServer();
+  const localIds = quotes.map(q => q.id);
+  
+  // Server takes precedence
+  serverQuotes.forEach(serverQuote => {
+    if (!localIds.includes(serverQuote.id)) {
+      quotes.unshift(serverQuote);
+    }
+  });
+  
+  // Send local changes to server
+  await sendQuotesToServer();
+  
+  saveQuotes();
+  populateCategories();
+  showStatus('Quotes synced successfully!');
+}
 
 
   // initialize categories and first view
